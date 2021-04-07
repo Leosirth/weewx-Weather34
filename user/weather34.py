@@ -681,6 +681,7 @@ class Weather34RealTime(StdService):
         loginf("'None' values will be displayed as %s" % self.nonesub)
         self.prev_archive_time = time.time()
         weewx_file_transfer = config_dict['Weather34RealTime'].get('weewx_file_transfer', '')
+        weewxserver_reverseProxy = config_dict['Weather34RealTime'].get('weewxserver_reverseProxy', '')
         weewxserver_ip = config_dict['Weather34RealTime'].get('weewxserver_address', '')
         if len(weewxserver_ip) == 0:
             weewxserver_ip = socket.gethostbyname(socket.gethostname())
@@ -772,7 +773,10 @@ class Weather34RealTime(StdService):
 
         try:
             lfilename = os.path.join(self.html_root, "serverdata","weewxserverinfo.txt") if len(self.webserver_addresses) == 0 else '/tmp/weather34/serverdata/weewxserverinfo.txt'
-            data = str(weewxserver_ip) + ":" + str(config_dict['Weather34RealTime'].get('weewx_port', '25252')) + ":" + weewx_file_transfer + ":" + bin_path
+            if len(weewxserver_reverseProxy) > 0:
+                data = str(weewxserver_reverseProxy) + ":" + weewx_file_transfer + ":" + bin_path
+            else:
+                data = str(weewxserver_ip) + ":" + str(config_dict['Weather34RealTime'].get('weewx_port', '25252')) + ":" + weewx_file_transfer + ":" + bin_path
             if len(self.webserver_addresses) > 0 and not os.path.exists(os.path.dirname(lfilename)):
                 os.mkdir(os.path.dirname(lfilename), 0o777)
             with open(lfilename, 'w') as f:
